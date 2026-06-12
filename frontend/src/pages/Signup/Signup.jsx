@@ -19,8 +19,6 @@ function Signup() {
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    console.log("btn clicked");
-    debugger
     try {
       const response = await api.post(
         "/auth/signup",
@@ -33,7 +31,7 @@ function Signup() {
 
       console.log("Signup Success:", response.data);
 
-      navigate("/login");
+      navigate("/");
 
     } catch (error) {
       console.log("Signup Error:", error.response?.data);
@@ -143,7 +141,7 @@ function Signup() {
 
           <p className="login-link">
             Already have an account?
-            <Link to="/login"> Login</Link>
+            <Link to="/"> Login</Link>
           </p>
 
         </div>

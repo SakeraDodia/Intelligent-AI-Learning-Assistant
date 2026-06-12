@@ -1,31 +1,34 @@
-import "./ForgotPassword.css";
+import "./VerifyOtp.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 
-function ForgotPassword() {
+function VerifyOtp() {
 
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
 
-  const handleSendOtp = async (e) => {
+  const email =
+    localStorage.getItem(
+      "resetEmail"
+    );
+
+  const handleVerifyOtp = async (e) => {
 
     e.preventDefault();
 
     try {
 
       await api.post(
-        "/auth/send-otp",
-        { email }
+        "/auth/verify-otp",
+        {
+          email,
+          otp
+        }
       );
 
-      localStorage.setItem(
-        "resetEmail",
-        email
-      );
-
-      navigate("/verify-otp");
+      navigate("/reset-password");
 
     } catch (error) {
 
@@ -41,25 +44,25 @@ function ForgotPassword() {
 
       <div className="forgot-card">
 
-        <h1>Forgot Password</h1>
+        <h1>Verify OTP</h1>
 
         <p>
-          Enter your registered email
+          Enter OTP sent to your email
         </p>
 
-        <form onSubmit={handleSendOtp}>
+        <form onSubmit={handleVerifyOtp}>
 
           <input
-            type="email"
-            placeholder="Email Address"
-            value={email}
+            type="text"
+            placeholder="Enter OTP"
+            value={otp}
             onChange={(e) =>
-              setEmail(e.target.value)
+              setOtp(e.target.value)
             }
           />
 
           <button type="submit">
-            Send OTP
+            Verify OTP
           </button>
 
         </form>
@@ -70,4 +73,4 @@ function ForgotPassword() {
   );
 }
 
-export default ForgotPassword;
+export default VerifyOtp;

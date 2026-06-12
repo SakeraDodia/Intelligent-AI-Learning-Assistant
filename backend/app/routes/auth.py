@@ -17,6 +17,24 @@ from app.utils.jwt import (
     create_access_token
 )
 
+from app.schemas.auth_schema import (
+    ForgotPasswordRequest,
+    VerifyOtpRequest,
+    ResetPasswordRequest
+)
+
+from app.utils.otp import (
+    generate_otp
+)
+
+from app.utils.email import (
+    send_otp_email
+)
+
+from app.database.db import (
+    otp_store
+)
+
 router = APIRouter(
     prefix="/auth",
     tags=["Authentication"]
@@ -71,4 +89,72 @@ def login(data: LoginRequest):
     raise HTTPException(
         status_code=401,
         detail="Invalid Credentials"
+    )
+
+@router.post("/send-otp")
+def send_otp(data: ForgotPasswordRequest):
+
+    otp = generate_otp()
+
+    otp_store[
+        data.email
+    ] = otp
+
+    send_otp_email(
+        data.email,
+        otp
+    )
+
+    return {
+        "message":
+        "OTP Sent Successfully"
+    }
+    
+@router.post("/verify-otp")
+def verify_otp(data: VerifyOtpRequest):
+
+    saved_otp = otp_store.get(
+        data.email
+    )
+
+    if saved_otp != data.otp:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid OTP"
+        )
+
+    return {
+        "success": True
+    }
+
+@router.post("/reset-password")
+def reset_password(data: ResetPasswordRequest):
+
+    for user in users:
+
+        if (
+            user["email"]
+            == data.email
+        ):
+
+            user["password"] = (
+                hash_password(
+                    data.new_password
+                )
+            )
+
+            otp_store.pop(
+                data.email,
+                None
+            )
+
+            return {
+                "message":
+                "Password Reset Successfully"
+            }
+
+    raise HTTPException(
+        status_code=404,
+        detail="User Not Found"
     )
