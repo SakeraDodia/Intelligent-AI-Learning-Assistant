@@ -11,8 +11,12 @@ import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
 function AppRoutes() {
   const routes = useRoutes([
     {
-      path: "/",
+      path: "/login",
       element: <Login />,
+    },
+    {
+      path: "signup",
+      element: <Signup />
     },
     {
       path: "/",
@@ -29,10 +33,6 @@ function AppRoutes() {
         {
           path: "profile",
           element: <Profile />,
-        },
-        {
-          path: "signup",
-          element: <Signup />
         },
         {
           path: "forgot-password",

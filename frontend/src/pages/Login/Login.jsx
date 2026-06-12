@@ -4,12 +4,39 @@ import robot from "../../assets/images/robot.png";
 import { FaGoogle, FaGithub } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { FaBrain } from "react-icons/fa";
+import { useState } from "react";
+import api from "../../services/api";
 
 function Login() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    navigate("/dashboard");
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await api.post(
+        "/auth/login",
+        {
+          email,
+          password,
+        }
+      );
+
+      console.log(response.data);
+
+      localStorage.setItem(
+        "token",
+        response.data.access_token
+      );
+
+      navigate("/dashboard");
+
+    } catch (error) {
+      console.log(error.response?.data);
+      console.log(error);
+    }
   };
 
   return (
@@ -52,11 +79,13 @@ function Login() {
             Login to continue your learning journey
           </p>
 
-          <form>
+          <form onSubmit={handleLogin}>
             <div className="input-group">
               <label>Email Address</label>
               <input
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
               />
             </div>
@@ -69,6 +98,8 @@ function Login() {
 
               <input
                 type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
               />
             </div>
