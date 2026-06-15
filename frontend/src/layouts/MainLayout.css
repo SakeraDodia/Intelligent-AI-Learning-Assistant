@@ -1,13 +1,14 @@
 .layout-container {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
   background: #f8fafc;
 }
 
 .main-content {
   flex: 1;
   padding: 24px;
-  overflow-y: auto;
+  overflow: hidden;
+  height: 100vh;
 }
 
 @media (max-width: 768px) {

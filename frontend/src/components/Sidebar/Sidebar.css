@@ -21,7 +21,7 @@
   align-items: center;
   gap: 12px;
 
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 }
 
 .logo-box {
@@ -51,27 +51,20 @@
 
 .sidebar-menu {
   flex: 1;
-
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px 10px;
 }
 
 .menu-item {
-  height: 48px;
-
+  height: 40px;
   display: flex;
   align-items: center;
   gap: 12px;
-
   padding: 0 14px;
-
   border-radius: 12px;
-
   color: rgba(255, 255, 255, 0.8);
-
   text-decoration: none;
-
   transition: 0.3s ease;
 }
 
