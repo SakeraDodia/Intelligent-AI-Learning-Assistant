@@ -1,6 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes.auth import router
+
+from app.routes.auth import router as auth_router
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI()
 
@@ -14,7 +18,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(router)
+# Auth Routes
+app.include_router(
+    auth_router,
+    prefix="/auth",
+    tags=["Authentication"]
+)
 
 @app.get("/")
 def home():

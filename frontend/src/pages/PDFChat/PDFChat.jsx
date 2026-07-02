@@ -1,4 +1,5 @@
 import "./PDFChat.css";
+import { useState } from "react";
 
 import {
   Upload,
@@ -6,29 +7,99 @@ import {
   Send,
   Paperclip,
   Bot,
-  FileSearch
+  FileSearch,
+  User
 } from "lucide-react";
+
+import {
+  uploadPDF,
+  askPDF
+} from "../../services/pdfService";
 
 function PDFChat() {
 
-  const documents = [
+  const [documents, setDocuments] = useState([]);
+
+  const [question, setQuestion] = useState("");
+
+  const [messages, setMessages] = useState([
     {
-      name: "Attention_in_AI_Vs_NN.pdf",
-      size: "8.4 MB"
+      sender: "user",
+      text: "What is the main idea of this paper?"
     },
     {
-      name: "LLM_Paper_2024.pdf",
-      size: "5.2 MB"
-    },
-    {
-      name: "RAG_Techniques.pdf",
-      size: "3.8 MB"
-    },
-    {
-      name: "Vector_Database.pdf",
-      size: "2.1 MB"
+      sender: "ai",
+      text: "The paper introduces the Transformer model which relies solely on attention mechanisms."
     }
-  ];
+  ]);
+
+  const handleUpload = async (e) => {
+
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    try {
+
+      await uploadPDF(file);
+
+      setDocuments(prev => [
+        {
+          name: file.name,
+          size: `${(file.size / 1024 / 1024).toFixed(1)} MB`
+        },
+        ...prev
+      ]);
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert("Upload Failed");
+    }
+  };
+
+  const handleSend = async () => {
+
+    if (!question.trim()) return;
+
+    const currentQuestion = question;
+
+    setMessages(prev => [
+      ...prev,
+      {
+        sender: "user",
+        text: currentQuestion
+      }
+    ]);
+
+    setQuestion("");
+
+    try {
+
+      const response = await askPDF(currentQuestion);
+
+      setMessages(prev => [
+        ...prev,
+        {
+          sender: "ai",
+          text: response.data.answer
+        }
+      ]);
+
+    } catch (error) {
+
+      console.error(error);
+
+      setMessages(prev => [
+        ...prev,
+        {
+          sender: "ai",
+          text: "Unable to generate answer."
+        }
+      ]);
+    }
+  };
 
   return (
     <div className="pdf-chat-page">
@@ -37,10 +108,20 @@ function PDFChat() {
 
         <h2>PDF Chat</h2>
 
-        <button className="upload-btn">
+        <label className="upload-btn">
+
           <Upload size={18} />
+
           Upload PDF
-        </button>
+
+          <input
+            type="file"
+            accept=".pdf"
+            hidden
+            onChange={handleUpload}
+          />
+
+        </label>
 
       </div>
 
@@ -117,33 +198,45 @@ function PDFChat() {
 
           <div className="pdf-messages">
 
-            <div className="user-question">
-              What is the main idea of this paper?
-            </div>
+            {messages.map((msg, index) => (
 
-            <div className="ai-answer">
+              msg.sender === "user" ? (
 
-              <div className="answer-header">
+                <div
+                  key={index}
+                  className="user-question"
+                >
 
-                <Bot size={18} />
+                  <User size={16} />
 
-                <span>AI Assistant</span>
+                  {msg.text}
 
-              </div>
+                </div>
 
-              <p>
-                The paper introduces the Transformer
-                model which relies solely on
-                attention mechanisms.
-              </p>
+              ) : (
 
-              <p>
-                It removes recurrent networks and
-                improves training efficiency while
-                achieving state-of-the-art results.
-              </p>
+                <div
+                  key={index}
+                  className="ai-answer"
+                >
 
-            </div>
+                  <div className="answer-header">
+
+                    <Bot size={18} />
+
+                    <span>
+                      AI Assistant
+                    </span>
+
+                  </div>
+
+                  <p>{msg.text}</p>
+
+                </div>
+
+              )
+
+            ))}
 
           </div>
 
@@ -157,10 +250,17 @@ function PDFChat() {
 
             <input
               type="text"
+              value={question}
+              onChange={(e) =>
+                setQuestion(e.target.value)
+              }
               placeholder="Ask a question about your PDF..."
             />
 
-            <button className="send-btn">
+            <button
+              className="send-btn"
+              onClick={handleSend}
+            >
 
               <Send size={18} />
 

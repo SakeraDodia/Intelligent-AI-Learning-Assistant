@@ -8,52 +8,53 @@
   align-items: center;
 
   z-index: 9999;
-}
 
-.logout-modal {
-  background: white;
-  width: 90%;
-  max-width: 400px;
 
-  padding: 30px;
+  .logout-modal {
+    background: white;
+    width: 90%;
+    max-width: 400px;
 
-  border-radius: 20px;
+    padding: 30px;
 
-  text-align: center;
-}
+    border-radius: 20px;
 
-.logout-modal h2 {
-  margin-bottom: 10px;
-}
+    text-align: center;
+  }
 
-.logout-modal p {
-  color: #64748b;
-}
+  .logout-modal h2 {
+    margin-bottom: 10px;
+  }
 
-.logout-actions {
-  display: flex;
-  gap: 12px;
+  .logout-modal p {
+    color: #64748b;
+  }
 
-  margin-top: 20px;
-}
+  .logout-actions {
+    display: flex;
+    gap: 12px;
 
-.cancel-btn,
-.confirm-btn {
-  flex: 1;
+    margin-top: 20px;
+  }
 
-  height: 45px;
+  .cancel-btn,
+  .confirm-btn {
+    flex: 1;
 
-  border: none;
-  border-radius: 10px;
+    height: 45px;
 
-  cursor: pointer;
-}
+    border: none;
+    border-radius: 10px;
 
-.cancel-btn {
-  background: #e5e7eb;
-}
+    cursor: pointer;
+  }
 
-.confirm-btn {
-  background: #7c3aed;
-  color: white;
+  .cancel-btn {
+    background: #e5e7eb;
+  }
+
+  .confirm-btn {
+    background: #7c3aed;
+    color: white;
+  }
 }

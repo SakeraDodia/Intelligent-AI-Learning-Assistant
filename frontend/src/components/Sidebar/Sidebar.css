@@ -1,19 +1,16 @@
 .sidebar {
   width: 260px;
   min-height: 100vh;
-
   background: linear-gradient(
     180deg,
     #081225,
     #040b17
   );
-
   color: white;
-
   display: flex;
   flex-direction: column;
-
   padding: 20px;
+  overflow: hidden;
 }
 
 .sidebar-logo {
