@@ -1,22 +1,16 @@
-torch
-torchvision
-torchaudio
+transformers==4.51.3
+trl==0.15.2
+peft==0.15.2
+accelerate==1.4.0
+bitsandbytes==0.46.0
+datasets==3.2.0
 
-transformers
-datasets
-accelerate
-peft
-trl
-bitsandbytes
+huggingface_hub>=0.30.0
 
 sentencepiece
 protobuf
 safetensors
-einops
 scipy
-
+einops
 numpy
-pandas
-tqdm
-packaging
-pyyaml
+evaluate
