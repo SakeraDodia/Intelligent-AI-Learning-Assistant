@@ -1,0 +1,29 @@
+# Environment files - anywhere in the project
+.env
+**/.env
+.env.*
+**/.env.*
+
+# Virtual environments - anywhere in the project
+venv/
+**/venv/
+.venv/
+**/.venv/
+
+# Python cache
+__pycache__/
+**/__pycache__/
+*.pyc
+
+# VS Code
+.vscode/
+
+# Model/training files
+outputs/
+**/outputs/
+checkpoints/
+**/checkpoints/
+*.safetensors
+*.bin
+*.pt
+*.pth
