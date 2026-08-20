@@ -2,51 +2,100 @@ from inference import generate_response
 
 
 SYSTEM_PROMPT = """
-You are an AI/ML learning roadmap assistant.
+You are an AI/ML Learning Roadmap Assistant.
 
-Create structured learning roadmaps.
+Create personalized and structured learning roadmaps.
 
-The roadmap must:
+Rules:
 
-1. Start from prerequisites.
-2. Progress from beginner to advanced.
-3. Clearly order the topics.
-4. Include important subtopics.
-5. Explain what should be learned first.
-6. Avoid unnecessary topics.
-7. Be practical for someone preparing for an AI/ML career.
+1. Understand what the user wants to learn.
+2. Consider the user's current level.
+3. Start with prerequisites.
+4. Progress from beginner to advanced.
+5. Organize topics into logical phases.
+6. Include important subtopics.
+7. Explain the recommended learning order.
+8. Include practical projects.
+9. Include practice recommendations.
+10. Avoid unnecessary unrelated topics.
+11. Make the roadmap practical for AI/ML learners.
 """
 
 
-print("=" * 60)
-print("ROADMAP GENERATION TEST")
-print("=" * 60)
+def roadmap():
+
+    print("\n========================================")
+    print("         LEARNING ROADMAP")
+    print("========================================")
 
 
-user_prompt = """
-Create a complete roadmap for becoming a
-Generative AI / LLM Engineer.
+    topic = input(
+        "\nWhat do you want to learn? "
+    )
 
-Include:
 
-Python
-Machine Learning
-Deep Learning
-NLP
-Transformers
-LLMs
-RAG
-Fine-tuning
-Deployment
+    current_level = input(
+        "What is your current level "
+        "(beginner/intermediate/advanced)? "
+    )
+
+
+    study_time = input(
+        "How much time can you study per day? "
+    )
+
+
+    duration = input(
+        "How many weeks/months do you have? "
+    )
+
+
+    print("\nGenerating roadmap...\n")
+
+
+    user_prompt = f"""
+Create a personalized learning roadmap.
+
+Topic:
+{topic}
+
+Current level:
+{current_level}
+
+Study time per day:
+{study_time}
+
+Available duration:
+{duration}
+
+Structure the roadmap as:
+
+1. Prerequisites
+2. Phase 1
+3. Phase 2
+4. Phase 3
+5. Advanced topics
+6. Practical projects
+7. Practice/revision
+8. Final project
+
+Explain what should be learned in each phase.
+
+Make the roadmap realistic and easy to follow.
 """
 
 
-response = generate_response(
-    SYSTEM_PROMPT,
-    user_prompt,
-    max_new_tokens=1200
-)
+    response = generate_response(
+        SYSTEM_PROMPT,
+        user_prompt,
+        max_new_tokens=1500
+    )
 
 
-print("\nMODEL RESPONSE:\n")
-print(response)
+    print("Assistant:")
+    print(response)
+
+
+if __name__ == "__main__":
+
+    roadmap()
