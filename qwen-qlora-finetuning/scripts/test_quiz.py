@@ -1,221 +1,362 @@
+import re
 from inference import generate_response
 
 
-SYSTEM_PROMPT = """
-You are an AI/ML Quiz Assistant.
+# ============================================================
+# Generate ONE quiz question
+# ============================================================
 
-Conduct an interactive quiz.
+def generate_quiz_question(topic, difficulty, question_number, previous_questions):
+    previous_text = "\n".join(
+        f"- {q}" for q in previous_questions
+    )
 
-Rules:
+    prompt = f"""
+You are a professional AI/ML quiz generator.
 
-1. Ask exactly ONE question at a time.
-2. Each question must have four options:
-   A
-   B
-   C
-   D
-3. Wait for the user's answer.
-4. Check the user's answer.
-5. Tell whether it is correct or incorrect.
-6. Give the correct answer.
-7. Give a short explanation.
-8. Then ask exactly ONE next question.
-9. Never ask multiple questions at once.
-10. Questions must match the selected topic and difficulty.
-11. Do not reveal the answer before the user answers.
+Generate EXACTLY ONE multiple-choice question.
+
+Topic: {topic}
+Difficulty: {difficulty}
+Question number: {question_number}
+
+Previously asked questions:
+{previous_text if previous_text else "None"}
+
+IMPORTANT RULES:
+1. Generate exactly ONE question.
+2. Do NOT repeat any previous question.
+3. Do NOT provide the answer.
+4. Do NOT provide an explanation.
+5. Do NOT generate another question.
+6. Give exactly four options: A, B, C, D.
+7. Make only ONE option correct.
+8. Keep the question relevant to the requested topic.
+9. Return ONLY this format:
+
+Question {question_number}: <question>
+
+A. <option>
+B. <option>
+C. <option>
+D. <option>
 """
 
+    response = generate_response(
+        prompt,
+        max_new_tokens=250
+    )
+
+    return clean_question(response, question_number)
+
+
+# ============================================================
+# Clean generated question
+# ============================================================
+
+def clean_question(response, question_number):
+
+    response = response.strip()
+
+    # Remove accidental extra questions
+    response = re.split(
+        r"\n\s*(?:Question\s*\d+[:.]|Q\d+[:.])",
+        response,
+        maxsplit=1,
+        flags=re.IGNORECASE
+    )[0]
+
+    # Remove unwanted answer/explanation sections
+    response = re.split(
+        r"\n\s*(?:Answer|Correct Answer|Explanation)[:.]?",
+        response,
+        maxsplit=1,
+        flags=re.IGNORECASE
+    )[0]
+
+    response = response.strip()
+
+    # If model forgot "Question X:"
+    if not re.match(
+        rf"^Question\s*{question_number}\s*:",
+        response,
+        re.IGNORECASE
+    ):
+        response = f"Question {question_number}: {response}"
+
+    return response
+
+
+# ============================================================
+# Extract question text
+# ============================================================
+
+def extract_question_text(question):
+
+    match = re.search(
+        r"Question\s*\d+\s*:\s*(.*?)(?=\n\s*A[.)])",
+        question,
+        flags=re.IGNORECASE | re.DOTALL
+    )
+
+    if match:
+        return match.group(1).strip()
+
+    return question.strip()
+
+
+# ============================================================
+# Extract options
+# ============================================================
+
+def extract_options(question):
+
+    options = {}
+
+    pattern = r"^\s*([ABCD])[.)]\s*(.+?)\s*$"
+
+    for line in question.splitlines():
+
+        match = re.match(
+            pattern,
+            line,
+            flags=re.IGNORECASE
+        )
+
+        if match:
+            letter = match.group(1).upper()
+            text = match.group(2).strip()
+
+            options[letter] = text
+
+    return options
+
+
+# ============================================================
+# Evaluate answer
+# ============================================================
+
+def evaluate_answer(question, user_answer, topic):
+
+    prompt = f"""
+You are a quiz evaluator.
+
+Topic: {topic}
+
+Question:
+{question}
+
+User answer:
+{user_answer}
+
+Evaluate the user's answer.
+
+IMPORTANT:
+1. Determine whether the answer is correct.
+2. If the user answered with A/B/C/D, compare it with the correct option.
+3. If the user entered the option text, determine whether it matches the correct answer.
+4. Give the correct answer.
+5. Give a short explanation.
+6. Do NOT generate another question.
+7. Do NOT ask the user anything.
+
+Return EXACTLY this format:
+
+RESULT: Correct
+
+CORRECT ANSWER: B
+
+EXPLANATION: <short explanation>
+"""
+
+    response = generate_response(
+        prompt,
+        max_new_tokens=180
+    )
+
+    return response.strip()
+
+
+# ============================================================
+# Validate user's answer
+# ============================================================
+
+def get_user_answer():
+
+    while True:
+
+        answer = input(
+            "\nYour answer (A/B/C/D or exit): "
+        ).strip()
+
+        if answer.lower() == "exit":
+            return "exit"
+
+        if answer.upper() in ["A", "B", "C", "D"]:
+            return answer.upper()
+
+        print("Please enter A, B, C, or D.")
+
+
+# ============================================================
+# Main Quiz
+# ============================================================
 
 def quiz():
 
-    print("\n========================================")
-    print("              QUIZ")
-    print("========================================")
+    print("\n" + "=" * 50)
+    print("                    QUIZ")
+    print("=" * 50)
 
+    topic = input("\nEnter quiz topic: ").strip()
 
-    topic = input("\nEnter quiz topic: ")
+    if not topic:
+        print("Topic cannot be empty.")
+        return
 
-    difficulty = input(
-        "Enter difficulty "
-        "(beginner/intermediate/advanced): "
-    )
+    while True:
 
-    total_questions = int(
-        input("How many questions? ")
-    )
+        difficulty = input(
+            "Enter difficulty "
+            "(beginner/intermediate/advanced): "
+        ).strip().lower()
 
-
-    print("\nStarting quiz...\n")
-
-
-    conversation = []
-
-    question_number = 1
-
-
-    # ------------------------------------
-    # FIRST QUESTION
-    # ------------------------------------
-
-    user_prompt = f"""
-Start a quiz.
-
-Topic: {topic}
-
-Difficulty: {difficulty}
-
-Total questions: {total_questions}
-
-Generate Question 1.
-
-Format:
-
-Question:
-...
-
-A. ...
-B. ...
-C. ...
-D. ...
-
-Do not give the answer.
-
-Ask exactly ONE question.
-"""
-
-
-    response = generate_response(
-        SYSTEM_PROMPT,
-        user_prompt,
-        max_new_tokens=500
-    )
-
-
-    print("Assistant:")
-    print(response)
-
-
-    conversation.append(
-        {
-            "role": "assistant",
-            "content": response
-        }
-    )
-
-
-    # ------------------------------------
-    # QUIZ LOOP
-    # ------------------------------------
-
-    while question_number <= total_questions:
-
-        print("\n----------------------------------------")
-
-        answer = input(
-            "Your answer (A/B/C/D or exit): "
-        )
-
-
-        if answer.lower() == "exit":
-
-            print("\nQuiz ended.")
-
+        if difficulty in [
+            "beginner",
+            "intermediate",
+            "advanced"
+        ]:
             break
 
-
-        conversation.append(
-            {
-                "role": "user",
-                "content": answer
-            }
+        print(
+            "Please enter beginner, intermediate, "
+            "or advanced."
         )
 
+    while True:
 
-        history = ""
+        try:
 
-        for message in conversation:
-
-            history += (
-                f"{message['role'].upper()}: "
-                f"{message['content']}\n"
+            total_questions = int(
+                input("How many questions? ").strip()
             )
 
+            if total_questions > 0:
+                break
 
-        question_number += 1
+            print("Enter a number greater than 0.")
 
+        except ValueError:
 
-        if question_number <= total_questions:
+            print("Please enter a valid number.")
 
-            next_question_instruction = f"""
-After evaluating the user's answer,
-ask Question {question_number}.
+    print("\nStarting quiz...")
+    print("-" * 50)
 
-Ask exactly ONE question.
+    previous_questions = []
 
-Do not reveal the answer before the user answers.
-"""
+    score = 0
 
-        else:
+    for question_number in range(
+        1,
+        total_questions + 1
+    ):
 
-            next_question_instruction = """
-This was the final question.
+        # ----------------------------------------------------
+        # Generate one NEW question
+        # ----------------------------------------------------
 
-Do not ask another question.
-
-Give the final quiz result and a short summary.
-"""
-
-
-        user_prompt = f"""
-Continue the quiz.
-
-Topic: {topic}
-
-Difficulty: {difficulty}
-
-Total questions: {total_questions}
-
-Conversation so far:
-
-{history}
-
-The user has just submitted an answer.
-
-Now:
-
-1. Check the answer.
-2. Say whether it is correct or incorrect.
-3. Give the correct answer.
-4. Give a short explanation.
-
-{next_question_instruction}
-"""
-
-
-        response = generate_response(
-            SYSTEM_PROMPT,
-            user_prompt,
-            max_new_tokens=600
+        question = generate_quiz_question(
+            topic=topic,
+            difficulty=difficulty,
+            question_number=question_number,
+            previous_questions=previous_questions
         )
 
+        # Save only the question text for duplicate prevention
+        question_text = extract_question_text(question)
+
+        previous_questions.append(question_text)
+
+        # ----------------------------------------------------
+        # Display question
+        # ----------------------------------------------------
 
         print("\nAssistant:")
-        print(response)
+        print(question)
 
+        # ----------------------------------------------------
+        # Get user's answer
+        # ----------------------------------------------------
 
-        conversation.append(
-            {
-                "role": "assistant",
-                "content": response
-            }
-        )
+        user_answer = get_user_answer()
 
+        if user_answer == "exit":
 
-        if question_number > total_questions:
-
+            print("\nQuiz ended.")
             break
 
+        # ----------------------------------------------------
+        # Evaluate answer
+        # ----------------------------------------------------
+
+        print("\nAssistant:")
+
+        evaluation = evaluate_answer(
+            question=question,
+            user_answer=user_answer,
+            topic=topic
+        )
+
+        print(evaluation)
+
+        # ----------------------------------------------------
+        # Calculate score
+        # ----------------------------------------------------
+
+        if re.search(
+            r"RESULT\s*:\s*Correct\b",
+            evaluation,
+            flags=re.IGNORECASE
+        ):
+            score += 1
+
+        # ----------------------------------------------------
+        # Separate questions
+        # ----------------------------------------------------
+
+        if question_number < total_questions:
+
+            print("\n" + "-" * 50)
+
+    # ========================================================
+    # Final Score
+    # ========================================================
+
+    print("\n" + "=" * 50)
+    print("                 QUIZ RESULT")
+    print("=" * 50)
+
+    print(
+        f"\nScore: {score}/{total_questions}"
+    )
+
+    if total_questions > 0:
+
+        percentage = (
+            score / total_questions
+        ) * 100
+
+        print(
+            f"Percentage: {percentage:.1f}%"
+        )
+
+    print("\nQuiz completed.")
+
+
+# ============================================================
+# Run
+# ============================================================
 
 if __name__ == "__main__":
-
     quiz()

@@ -59,6 +59,11 @@ def load_model():
 
     model.eval()
 
-    print("Model loaded successfully!")
-
     return model, tokenizer
+
+# Test model loading when this file is run directly
+if __name__ == "__main__":
+
+    model, tokenizer = load_model()
+
+    print("Model loaded successfully!")
