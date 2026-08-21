@@ -1,9 +1,11 @@
 import "./Chat.css";
 import { useState } from "react";
 import { Send, Bot, User, Plus } from "lucide-react";
+import { sendChatMessage } from "../services/api";
 
 function Chat() {
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [messages, setMessages] = useState([
     {
@@ -21,26 +23,51 @@ function Chat() {
     "Python Basics"
   ];
 
-  const handleSend = () => {
-    if (!message.trim()) return;
+  const handleSend = async () => {
+    if (!message.trim() || loading) return;
 
-    const userMessage = {
-      sender: "user",
-      text: message
-    };
+    const userMessage = message.trim();
 
-    const aiMessage = {
-      sender: "ai",
-      text: "This is a static UI. AI response will appear here after backend integration."
-    };
-
+    // Add user message immediately
     setMessages((prev) => [
       ...prev,
-      userMessage,
-      aiMessage
+      {
+        sender: "user",
+        text: userMessage
+      }
     ]);
 
+    // Clear input
     setMessage("");
+
+    // Start loading
+    setLoading(true);
+
+    try {
+      // Send message to FastAPI
+      const data = await sendChatMessage(userMessage);
+
+      // Add AI response
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "ai",
+          text: data.response
+        }
+      ]);
+    } catch (error) {
+      console.error("Chat API Error:", error);
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "ai",
+          text: "❌ Unable to connect to the AI backend. Please make sure the FastAPI server is running."
+        }
+      ]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -115,6 +142,22 @@ function Chat() {
 
           ))}
 
+          {/* Loading message */}
+
+          {loading && (
+            <div className="message ai">
+
+              <div className="message-icon">
+                <Bot size={18} />
+              </div>
+
+              <div className="message-content">
+                Thinking...
+              </div>
+
+            </div>
+          )}
+
         </div>
 
         {/* Input */}
@@ -123,8 +166,13 @@ function Chat() {
 
           <input
             type="text"
-            placeholder="Ask anything..."
+            placeholder={
+              loading
+                ? "AI is generating a response..."
+                : "Ask anything..."
+            }
             value={message}
+            disabled={loading}
             onChange={(e) =>
               setMessage(e.target.value)
             }
@@ -135,7 +183,10 @@ function Chat() {
             }}
           />
 
-          <button onClick={handleSend}>
+          <button
+            onClick={handleSend}
+            disabled={loading || !message.trim()}
+          >
             <Send size={18} />
           </button>
 

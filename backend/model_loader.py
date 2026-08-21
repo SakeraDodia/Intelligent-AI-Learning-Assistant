@@ -129,3 +129,7 @@ def load_model():
         print(f"GPU memory allocated: {memory:.2f} GB")
 
     return model, tokenizer
+
+if __name__ == "__main__":
+    model, tokenizer = load_model()
+    print("\nMODEL TEST PASSED!")

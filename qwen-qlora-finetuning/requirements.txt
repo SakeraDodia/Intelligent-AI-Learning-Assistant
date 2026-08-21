@@ -1,4 +1,3 @@
-torch>=2.4
 transformers>=4.37
 datasets
 accelerate
@@ -7,3 +6,4 @@ trl
 bitsandbytes
 safetensors
 sentencepiece
+huggingface_hub[cli]
