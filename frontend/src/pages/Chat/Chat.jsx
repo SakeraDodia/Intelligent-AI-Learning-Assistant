@@ -1,7 +1,7 @@
 import "./Chat.css";
 import { useState } from "react";
 import { Send, Bot, User, Plus } from "lucide-react";
-import { sendChatMessage } from "../services/api";
+import { sendChatMessage } from "../../services/api";
 
 function Chat() {
   const [message, setMessage] = useState("");
