@@ -9,10 +9,117 @@ import {
   Trophy
 } from "lucide-react";
 
+import { generateRoadmap } from "../../services/api";
+
 function Roadmap() {
 
   const [generated, setGenerated] =
     useState(false);
+
+  const [topic, setTopic] =
+    useState("");
+
+  const [duration, setDuration] =
+    useState("3 Months");
+
+  const [currentLevel, setCurrentLevel] =
+    useState("Beginner");
+
+  const [studyTime, setStudyTime] =
+    useState("2 hours per day");
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const [roadmap, setRoadmap] =
+    useState("");
+
+  const [roadmapData, setRoadmapData] =
+    useState([]);
+
+
+  // ======================================================
+  // GENERATE ROADMAP
+  // ======================================================
+
+  const handleGenerateRoadmap = async () => {
+
+    if (!topic.trim() || loading) {
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+
+      const data =
+        await generateRoadmap(
+          topic,
+          currentLevel,
+          studyTime,
+          duration
+        );
+
+
+      const response =
+        data.roadmap ||
+        data.response ||
+        data.content ||
+        "";
+
+
+      setRoadmap(response);
+
+
+      // If backend returns structured phases
+      if (Array.isArray(data.phases)) {
+
+        setRoadmapData(
+          data.phases
+        );
+
+      } else {
+
+        setRoadmapData([]);
+
+      }
+
+
+      setGenerated(true);
+
+    } catch (error) {
+
+      console.error(
+        "Roadmap API Error:",
+        error
+      );
+
+      alert(
+        "Unable to generate roadmap. Please check the backend."
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
+  };
+
+
+  // ======================================================
+  // GENERATE AGAIN
+  // ======================================================
+
+  const handleGenerateAgain = () => {
+
+    setGenerated(false);
+
+    setRoadmap("");
+
+    setRoadmapData([]);
+
+  };
+
 
   return (
 
@@ -33,12 +140,26 @@ function Roadmap() {
             for any career goal
           </p>
 
+
           <input
             type="text"
             placeholder="Goal (React Developer)"
+            value={topic}
+            onChange={(e) =>
+              setTopic(e.target.value)
+            }
           />
 
-          <select>
+
+          <select
+            value={duration}
+            onChange={(e) =>
+              setDuration(
+                e.target.value
+              )
+            }
+          >
+
             <option>
               3 Months
             </option>
@@ -50,9 +171,19 @@ function Roadmap() {
             <option>
               12 Months
             </option>
+
           </select>
 
-          <select>
+
+          <select
+            value={currentLevel}
+            onChange={(e) =>
+              setCurrentLevel(
+                e.target.value
+              )
+            }
+          >
+
             <option>
               Beginner
             </option>
@@ -64,14 +195,52 @@ function Roadmap() {
             <option>
               Advanced
             </option>
+
           </select>
 
-          <button
-            onClick={() =>
-              setGenerated(true)
+
+          <select
+            value={studyTime}
+            onChange={(e) =>
+              setStudyTime(
+                e.target.value
+              )
             }
           >
-            Generate Roadmap
+
+            <option>
+              1 hour per day
+            </option>
+
+            <option>
+              2 hours per day
+            </option>
+
+            <option>
+              3 hours per day
+            </option>
+
+            <option>
+              4+ hours per day
+            </option>
+
+          </select>
+
+
+          <button
+            onClick={
+              handleGenerateRoadmap
+            }
+            disabled={
+              loading ||
+              !topic.trim()
+            }
+          >
+
+            {loading
+              ? "Generating..."
+              : "Generate Roadmap"}
+
           </button>
 
         </div>
@@ -83,84 +252,107 @@ function Roadmap() {
           <div className="roadmap-header">
 
             <h2>
-              React Developer Roadmap
+              {topic} Roadmap
             </h2>
 
+
             <button
-              onClick={() =>
-                setGenerated(false)
+              onClick={
+                handleGenerateAgain
               }
             >
+
               Generate Again
+
             </button>
 
           </div>
 
-          <div className="milestone-card">
 
-            <BookOpen size={24} />
+          {/* STRUCTURED ROADMAP */}
 
-            <div>
+          {roadmapData.length > 0 ? (
 
-              <h3>
-                Month 1
-              </h3>
+            roadmapData.map(
+              (phase, index) => (
 
-              <p>
-                HTML, CSS, JavaScript
-              </p>
+                <div
+                  className="milestone-card"
+                  key={index}
+                >
+
+                  {index === 0 ? (
+                    <BookOpen size={24} />
+                  ) : index ===
+                    roadmapData.length - 1 ? (
+                    <Trophy size={24} />
+                  ) : (
+                    <Rocket size={24} />
+                  )}
+
+
+                  <div>
+
+                    <h3>
+                      {phase.title ||
+                        phase.phase ||
+                        `Phase ${index + 1}`}
+                    </h3>
+
+                    <p>
+                      {phase.description ||
+                        phase.topics ||
+                        phase.content ||
+                        ""}
+                    </p>
+
+                  </div>
+
+
+                  <div className="progress">
+
+                    {phase.progress ||
+                      `${Math.round(
+                        ((index + 1) /
+                          roadmapData.length) *
+                          100
+                      )}%`}
+
+                  </div>
+
+                </div>
+
+              )
+            )
+
+          ) : (
+
+            /* TEXT ROADMAP */
+
+            <div className="milestone-card">
+
+              <BookOpen size={24} />
+
+              <div>
+
+                <h3>
+                  AI Generated Roadmap
+                </h3>
+
+                <p
+                  style={{
+                    whiteSpace:
+                      "pre-wrap"
+                  }}
+                >
+                  {roadmap}
+                </p>
+
+              </div>
 
             </div>
 
-            <div className="progress">
-              100%
-            </div>
-
-          </div>
-
-          <div className="milestone-card">
-
-            <Rocket size={24} />
-
-            <div>
-
-              <h3>
-                Month 2
-              </h3>
-
-              <p>
-                React Basics & Components
-              </p>
-
-            </div>
-
-            <div className="progress">
-              75%
-            </div>
-
-          </div>
-
-          <div className="milestone-card">
-
-            <Trophy size={24} />
-
-            <div>
-
-              <h3>
-                Month 3
-              </h3>
-
-              <p>
-                APIs & Projects
-              </p>
-
-            </div>
-
-            <div className="progress">
-              40%
-            </div>
-
-          </div>
+          )}
 
         </div>
 

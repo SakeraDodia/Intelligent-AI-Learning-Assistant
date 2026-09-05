@@ -1,38 +1,178 @@
 import "./Quiz.css";
+
 import { useState } from "react";
+
 import {
   Brain,
   PlayCircle,
   CheckCircle
 } from "lucide-react";
 
+import { generateQuiz } from "../../services/api";
+
 function Quiz() {
 
   const [screen, setScreen] =
     useState("start");
 
-  const questions = [
-    {
-      question:
-        "What is React Hook?",
-      options: [
-        "State Management",
-        "Function",
-        "Library",
-        "Database"
-      ]
-    },
-    {
-      question:
-        "Which hook is used for state?",
-      options: [
-        "useEffect",
-        "useMemo",
-        "useState",
-        "useRef"
-      ]
+  const [topic, setTopic] =
+    useState("");
+
+  const [difficulty, setDifficulty] =
+    useState("medium");
+
+  const [numberOfQuestions, setNumberOfQuestions] =
+    useState(5);
+
+  const [questions, setQuestions] =
+    useState([]);
+
+  const [answers, setAnswers] =
+    useState({});
+
+  const [score, setScore] =
+    useState(0);
+
+  const [loading, setLoading] =
+    useState(false);
+
+
+  // ======================================================
+  // GENERATE QUIZ
+  // ======================================================
+
+  const handleGenerateQuiz = async () => {
+
+    if (!topic.trim() || loading) {
+      return;
     }
-  ];
+
+    setLoading(true);
+
+    try {
+
+      const data = await generateQuiz(
+        topic,
+        difficulty,
+        Number(numberOfQuestions)
+      );
+
+      let generatedQuestions =
+        data.questions ||
+        data.quiz ||
+        data.data ||
+        [];
+
+      // Handle string response if backend
+      // returns generated JSON/text
+      if (typeof generatedQuestions === "string") {
+
+        try {
+
+          generatedQuestions =
+            JSON.parse(
+              generatedQuestions
+            );
+
+        } catch {
+
+          console.error(
+            "Quiz response is not valid JSON"
+          );
+
+        }
+      }
+
+      setQuestions(
+        Array.isArray(generatedQuestions)
+          ? generatedQuestions
+          : []
+      );
+
+      setAnswers({});
+
+      setScore(0);
+
+      setScreen("quiz");
+
+    } catch (error) {
+
+      console.error(
+        "Quiz API Error:",
+        error
+      );
+
+      alert(
+        "Unable to generate quiz. Please check the backend."
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
+  };
+
+
+  // ======================================================
+  // SELECT ANSWER
+  // ======================================================
+
+  const handleAnswerChange = (
+    questionIndex,
+    answer
+  ) => {
+
+    setAnswers((prev) => ({
+      ...prev,
+      [questionIndex]: answer
+    }));
+
+  };
+
+
+  // ======================================================
+  // SUBMIT QUIZ
+  // ======================================================
+
+  const handleSubmitQuiz = () => {
+
+    let correct = 0;
+
+    questions.forEach(
+      (question, index) => {
+
+        const selected =
+          answers[index];
+
+        const correctAnswer =
+          question.answer ||
+          question.correct_answer ||
+          question.correctAnswer;
+
+        if (
+          selected &&
+          correctAnswer &&
+          selected.toLowerCase() ===
+            String(correctAnswer).toLowerCase()
+        ) {
+
+          correct++;
+
+        }
+
+      }
+    );
+
+    setScore(correct);
+
+    setScreen("result");
+  };
+
+
+  // ======================================================
+  // START SCREEN
+  // ======================================================
 
   return (
 
@@ -55,21 +195,67 @@ function Quiz() {
           <input
             type="text"
             placeholder="Enter Topic"
+            value={topic}
+            onChange={(e) =>
+              setTopic(e.target.value)
+            }
+          />
+
+          <select
+            value={difficulty}
+            onChange={(e) =>
+              setDifficulty(e.target.value)
+            }
+          >
+
+            <option value="easy">
+              Easy
+            </option>
+
+            <option value="medium">
+              Medium
+            </option>
+
+            <option value="hard">
+              Hard
+            </option>
+
+          </select>
+
+          <input
+            type="number"
+            min="1"
+            max="20"
+            value={numberOfQuestions}
+            onChange={(e) =>
+              setNumberOfQuestions(
+                e.target.value
+              )
+            }
           />
 
           <button
-            onClick={() =>
-              setScreen("quiz")
+            onClick={handleGenerateQuiz}
+            disabled={
+              loading ||
+              !topic.trim()
             }
           >
+
             <PlayCircle size={18} />
 
-            Generate Quiz
+            {loading
+              ? "Generating..."
+              : "Generate Quiz"}
+
           </button>
 
         </div>
 
       )}
+
+
+      {/* QUIZ SCREEN */}
 
       {screen === "quiz" && (
 
@@ -78,14 +264,15 @@ function Quiz() {
           <div className="quiz-topbar">
 
             <h2>
-              React Fundamentals Quiz
+              {topic} Quiz
             </h2>
 
             <span>
-              2 Questions
+              {questions.length} Questions
             </span>
 
           </div>
+
 
           {questions.map(
             (item, index) => (
@@ -96,13 +283,21 @@ function Quiz() {
               >
 
                 <h3>
+
                   {index + 1}.{" "}
+
                   {item.question}
+
                 </h3>
+
 
                 <div className="options">
 
-                  {item.options.map(
+                  {(
+                    item.options ||
+                    item.choices ||
+                    []
+                  ).map(
                     (option, i) => (
 
                       <label
@@ -113,6 +308,17 @@ function Quiz() {
                         <input
                           type="radio"
                           name={`q${index}`}
+                          value={option}
+                          checked={
+                            answers[index] ===
+                            option
+                          }
+                          onChange={() =>
+                            handleAnswerChange(
+                              index,
+                              option
+                            )
+                          }
                         />
 
                         {option}
@@ -129,11 +335,10 @@ function Quiz() {
             )
           )}
 
+
           <button
             className="submit-btn"
-            onClick={() =>
-              setScreen("result")
-            }
+            onClick={handleSubmitQuiz}
           >
             Submit Quiz
           </button>
@@ -141,6 +346,9 @@ function Quiz() {
         </div>
 
       )}
+
+
+      {/* RESULT SCREEN */}
 
       {screen === "result" && (
 
@@ -153,11 +361,19 @@ function Quiz() {
           </h2>
 
           <div className="score-box">
-            8 / 10
+
+            {score} / {questions.length}
+
           </div>
 
           <p>
-            Great Job!
+
+            {score === questions.length
+              ? "Excellent!"
+              : score >= questions.length / 2
+              ? "Great Job!"
+              : "Keep Practicing!"}
+
           </p>
 
           <button
@@ -165,7 +381,9 @@ function Quiz() {
               setScreen("start")
             }
           >
+
             Start New Quiz
+
           </button>
 
         </div>

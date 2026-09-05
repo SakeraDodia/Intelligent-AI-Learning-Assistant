@@ -1,257 +1,394 @@
-.interview-page{
-  width:100%;
-  min-height:100vh;
-
-  display:flex;
-  justify-content:center;
-  align-items:center;
+.interview-page {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+  box-sizing: border-box;
 }
 
-/* START */
 
-.interview-card{
-  width:500px;
+/* ================================
+ START
+================================ */
 
-  background:white;
-
-  border:1px solid #e5e7eb;
-  border-radius:24px;
-
-  padding:40px;
-
-  text-align:center;
+.interview-card {
+  width: 500px;
+  max-width: 100%;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 24px;
+  padding: 40px;
+  text-align: center;
+  box-sizing: border-box;
 }
 
-.interview-card svg{
-  color:#6d4aff;
+.interview-card svg {
+  color: #6d4aff;
 }
 
-.interview-card h2{
-  margin:20px 0 10px;
+.interview-card h2 {
+  margin: 20px 0 10px;
+  color: #1e293b;
 }
 
-.interview-card p{
-  color:#64748b;
-  margin-bottom:20px;
+.interview-card p {
+  color: #64748b;
+  margin-bottom: 20px;
 }
 
-.interview-card input{
-  width:100%;
-  height:55px;
-
-  border:1px solid #e5e7eb;
-  border-radius:12px;
-
-  padding:0 16px;
-
-  margin-bottom:20px;
+.interview-card input,
+.interview-card select {
+  width: 100%;
+  height: 55px;
+  box-sizing: border-box;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 0 16px;
+  margin-bottom: 14px;
+  outline: none;
+  background: white;
+  font-size: 15px;
 }
 
-.interview-card button{
-  width:100%;
-  height:55px;
-
-  border:none;
-
-  background:#6d4aff;
-  color:white;
-
-  border-radius:12px;
-
-  cursor:pointer;
+.interview-card input:focus,
+.interview-card select:focus {
+  border-color: #6d4aff;
 }
 
-/* CHAT */
-
-.interview-chat{
-  width:100%;
-  max-width:900px;
-
-  background:white;
-
-  border:1px solid #e5e7eb;
-  border-radius:24px;
-
-  overflow:hidden;
+.interview-card button {
+  width: 100%;
+  height: 55px;
+  border: none;
+  background: #6d4aff;
+  color: white;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
 }
 
-.chat-header{
-  padding:20px;
-
-  border-bottom:1px solid #e5e7eb;
-
-  display:flex;
-  justify-content:space-between;
+.interview-card button:hover {
+  background: #5b3de0;
 }
 
-.messages{
-  padding:20px;
-
-  min-height:350px;
+.interview-card button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-.message{
-  display:flex;
-  gap:12px;
 
-  margin-bottom:20px;
+/* ================================
+ CHAT
+================================ */
+
+.interview-chat {
+  width: 100%;
+  max-width: 900px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 24px;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
-.icon{
-  width:40px;
-  height:40px;
-
-  border-radius:50%;
-
-  background:#6d4aff;
-  color:white;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
+.chat-header {
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
 }
 
-.bubble{
-  padding:14px 18px;
-
-  border-radius:14px;
-
-  max-width:70%;
+.chat-header h2 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 20px;
 }
 
-.ai .bubble{
-  background:#f8fafc;
+.chat-header span {
+  color: #6d4aff;
+  background: #f4f0ff;
+  padding: 8px 12px;
+  border-radius: 10px;
+  white-space: nowrap;
 }
 
-.user .bubble{
-  background:#6d4aff;
-  color:white;
+
+/* ================================
+ MESSAGES
+================================ */
+
+.messages {
+  padding: 20px;
+  min-height: 350px;
+  max-height: 500px;
+  overflow-y: auto;
 }
 
-.answer-area{
-  padding:20px;
-  border-top:1px solid #e5e7eb;
+.message {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
-.answer-area textarea{
-  width:100%;
-  height:100px;
-
-  border:1px solid #e5e7eb;
-  border-radius:12px;
-
-  padding:14px;
-
-  resize:none;
+.icon {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  background: #6d4aff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.answer-area button{
-  width:100%;
-
-  height:55px;
-
-  margin-top:12px;
-
-  border:none;
-
-  background:#6d4aff;
-  color:white;
-
-  border-radius:12px;
+.bubble {
+  padding: 14px 18px;
+  border-radius: 14px;
+  max-width: 70%;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
-/* REPORT */
-
-.report-card{
-  width:500px;
-
-  background:white;
-
-  border:1px solid #e5e7eb;
-  border-radius:24px;
-
-  text-align:center;
-
-  padding:40px;
+.ai .bubble {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  color: #334155;
 }
 
-.report-card svg{
-  color:#f59e0b;
+.user {
+  flex-direction: row-reverse;
 }
 
-.score-circle{
-  width:140px;
-  height:140px;
-
-  margin:24px auto;
-
-  border-radius:50%;
-
-  background:#f4f0ff;
-
-  color:#6d4aff;
-
-  display:flex;
-  justify-content:center;
-  align-items:center;
-
-  font-size:30px;
-  font-weight:700;
+.user .bubble {
+  background: #6d4aff;
+  color: white;
 }
 
-.skills{
-  margin-top:20px;
+
+/* ================================
+ ANSWER
+================================ */
+
+.answer-area {
+  padding: 20px;
+  border-top: 1px solid #e5e7eb;
 }
 
-.skill{
-  display:flex;
-  justify-content:space-between;
-
-  padding:12px 0;
-
-  border-bottom:1px solid #e5e7eb;
+.answer-area textarea {
+  width: 100%;
+  height: 100px;
+  box-sizing: border-box;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 14px;
+  resize: vertical;
+  outline: none;
+  font-family: inherit;
+  font-size: 15px;
 }
 
-.report-card button{
-  width:100%;
-
-  height:55px;
-
-  margin-top:20px;
-
-  border:none;
-
-  background:#6d4aff;
-  color:white;
-
-  border-radius:12px;
+.answer-area textarea:focus {
+  border-color: #6d4aff;
 }
 
-/* RESPONSIVE */
+.answer-area button {
+  width: 100%;
+  min-height: 55px;
+  margin-top: 12px;
+  border: none;
+  background: #6d4aff;
+  color: white;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
 
-@media(max-width:768px){
+.answer-area button:hover {
+  background: #5b3de0;
+}
+
+.answer-area button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+/* ================================
+ REPORT
+================================ */
+
+.report-card {
+  width: 500px;
+  max-width: 100%;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 24px;
+  text-align: center;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+.report-card svg {
+  color: #f59e0b;
+}
+
+.report-card h2 {
+  color: #1e293b;
+}
+
+.report-card p {
+  color: #64748b;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.score-circle {
+  width: 140px;
+  height: 140px;
+  margin: 24px auto;
+  border-radius: 50%;
+  background: #f4f0ff;
+  color: #6d4aff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.skills {
+  margin-top: 20px;
+}
+
+.skill {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e7eb;
+  color: #334155;
+}
+
+.skill span {
+  color: #6d4aff;
+  font-weight: 600;
+  text-align: right;
+}
+
+.report-card button {
+  width: 100%;
+  height: 55px;
+  margin-top: 20px;
+  border: none;
+  background: #6d4aff;
+  color: white;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+
+/* ================================
+ TABLET
+================================ */
+
+@media (max-width: 768px) {
+
+  .interview-page {
+      align-items: flex-start;
+  }
 
   .interview-card,
-  .report-card{
-    width:100%;
+  .report-card {
+      width: 100%;
   }
 
-  .chat-header{
-    flex-direction:column;
-    gap:10px;
+  .interview-chat {
+      border-radius: 18px;
   }
 
-  .bubble{
-    max-width:90%;
+  .chat-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+  }
+
+  .messages {
+      min-height: 300px;
+  }
+
+  .bubble {
+      max-width: 90%;
   }
 
 }
 
-@media(max-width:576px){
+
+/* ================================
+ MOBILE
+================================ */
+
+@media (max-width: 576px) {
+
+  .interview-page {
+      padding: 10px 0;
+  }
 
   .interview-card,
-  .report-card{
-    padding:24px 16px;
+  .report-card {
+      padding: 24px 16px;
+      border-radius: 18px;
+  }
+
+  .chat-header {
+      padding: 16px;
+  }
+
+  .chat-header h2 {
+      font-size: 17px;
+  }
+
+  .messages {
+      padding: 16px;
+      min-height: 280px;
+  }
+
+  .message {
+      gap: 8px;
+  }
+
+  .icon {
+      width: 34px;
+      height: 34px;
+      min-width: 34px;
+  }
+
+  .bubble {
+      max-width: calc(100% - 45px);
+      padding: 11px 14px;
+      font-size: 14px;
+  }
+
+  .answer-area {
+      padding: 16px;
+  }
+
+  .answer-area textarea {
+      height: 110px;
+  }
+
+  .score-circle {
+      width: 120px;
+      height: 120px;
+      font-size: 26px;
   }
 
 }

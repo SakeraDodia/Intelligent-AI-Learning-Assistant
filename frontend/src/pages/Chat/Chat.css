@@ -1,40 +1,46 @@
 .chat-page {
   display: flex;
+  width: 100%;
   height: calc(100vh - 40px);
+  min-height: 500px;
   background: #f8fafc;
   border-radius: 20px;
   overflow: hidden;
 }
 
-/* LEFT */
+
+/* ================================
+ LEFT SIDEBAR
+================================ */
 
 .chat-sidebar {
   width: 280px;
+  flex-shrink: 0;
   background: white;
   border-right: 1px solid #e2e8f0;
-
   display: flex;
   flex-direction: column;
-
   padding: 20px;
+  box-sizing: border-box;
 }
 
 .new-chat-btn {
   height: 50px;
   border: none;
-
   background: #7c3aed;
   color: white;
-
   border-radius: 12px;
-
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-
   cursor: pointer;
   font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.new-chat-btn:hover {
+  background: #6d28d9;
 }
 
 .chat-history {
@@ -47,34 +53,39 @@
   border-radius: 10px;
   cursor: pointer;
   margin-bottom: 10px;
-
   transition: 0.3s;
+  word-break: break-word;
 }
 
 .history-item:hover {
   background: #f1f5f9;
 }
 
-/* RIGHT */
+
+/* ================================
+ RIGHT
+================================ */
 
 .chat-container {
   flex: 1;
-
+  min-width: 0;
   display: flex;
   flex-direction: column;
 }
 
+
+/* ================================
+ HEADER
+================================ */
+
 .chat-header {
   height: 75px;
-
+  flex-shrink: 0;
   background: white;
-
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   padding: 0 25px;
-
   border-bottom: 1px solid #e2e8f0;
 }
 
@@ -84,15 +95,25 @@
   gap: 10px;
 }
 
+.header-left svg {
+  color: #7c3aed;
+}
+
 .header-left h2 {
   font-size: 20px;
+  margin: 0;
 }
+
+
+/* ================================
+ MESSAGES
+================================ */
 
 .messages-container {
   flex: 1;
   overflow-y: auto;
-
   padding: 25px;
+  scroll-behavior: smooth;
 }
 
 .message {
@@ -104,12 +125,10 @@
 .message-icon {
   width: 40px;
   height: 40px;
-
+  min-width: 40px;
   border-radius: 50%;
-
   background: #7c3aed;
   color: white;
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -118,10 +137,14 @@
 .message-content {
   max-width: 70%;
   padding: 14px 18px;
-
   border-radius: 16px;
-
   line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.message.user {
+  flex-direction: row-reverse;
 }
 
 .message.user .message-content {
@@ -132,59 +155,135 @@
 .message.ai .message-content {
   background: white;
   border: 1px solid #e2e8f0;
+  color: #334155;
 }
+
+
+/* ================================
+ INPUT
+================================ */
 
 .chat-input-area {
   background: white;
   border-top: 1px solid #e2e8f0;
-
   padding: 20px;
-
   display: flex;
   gap: 12px;
 }
 
 .chat-input-area input {
   flex: 1;
-
+  min-width: 0;
   height: 55px;
-
+  box-sizing: border-box;
   border: 1px solid #dbe2ea;
   border-radius: 12px;
-
   padding: 0 18px;
-
   outline: none;
+}
+
+.chat-input-area input:focus {
+  border-color: #7c3aed;
 }
 
 .chat-input-area button {
   width: 55px;
+  min-width: 55px;
   height: 55px;
-
   border: none;
-
   background: #7c3aed;
   color: white;
-
   border-radius: 12px;
-
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* MOBILE */
+.chat-input-area button:hover {
+  background: #6d28d9;
+}
+
+.chat-input-area button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* ================================
+ TABLET
+================================ */
 
 @media (max-width: 992px) {
+
   .chat-sidebar {
-    display: none;
+      display: none;
   }
+
+  .chat-page {
+      border-radius: 16px;
+  }
+
 }
 
+
+/* ================================
+ MOBILE
+================================ */
+
 @media (max-width: 576px) {
-  .message-content {
-    max-width: 90%;
+
+  .chat-page {
+      height: calc(100vh - 20px);
+      min-height: 450px;
+      border-radius: 12px;
   }
 
-  .chat-header h2 {
-    font-size: 16px;
+  .chat-header {
+      height: 65px;
+      padding: 0 15px;
   }
+
+  .header-left h2 {
+      font-size: 16px;
+  }
+
+  .messages-container {
+      padding: 16px 12px;
+  }
+
+  .message {
+      gap: 8px;
+      margin-bottom: 15px;
+  }
+
+  .message-icon {
+      width: 34px;
+      height: 34px;
+      min-width: 34px;
+  }
+
+  .message-content {
+      max-width: calc(100% - 42px);
+      padding: 11px 14px;
+      font-size: 14px;
+      border-radius: 13px;
+  }
+
+  .chat-input-area {
+      padding: 12px;
+      gap: 8px;
+  }
+
+  .chat-input-area input {
+      height: 48px;
+      padding: 0 13px;
+  }
+
+  .chat-input-area button {
+      width: 48px;
+      min-width: 48px;
+      height: 48px;
+  }
+
 }
